@@ -1,0 +1,348 @@
+{
+    "category": {
+        "Paneer Sabji": [
+            {
+                "id": 1101,
+                "name": "Matar Paneer",
+                "half_price": "80",
+                "full_price": "130"
+            },
+            {
+                "id": 1102,
+                "name": "Palak Paneer",
+                "half_price": "90",
+                "full_price": "130"
+            },
+            {
+                "id": 1103,
+                "name": "Methi Paneer",
+                "half_price": "90",
+                "full_price": "130"
+            },
+            {
+                "id": 1104,
+                "name": "Chole Paneer",
+                "half_price": "90",
+                "full_price": "130"
+            },
+            {
+                "id": 1105,
+                "name": "Shahi Paneer",
+                "half_price": "90",
+                "full_price": "150"
+            },
+            {
+                "id": 1106,
+                "name": "Kadhai Paneer",
+                "half_price": "90",
+                "full_price": "150"
+            },
+            {
+                "id": 1107,
+                "name": "Paneer Butter Masala",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1108,
+                "name": "Paneer Do Pyaza",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1109,
+                "name": "Paneer Korma",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1110,
+                "name": "Paneer Lazawab",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1111,
+                "name": "Navratan Korma",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1112,
+                "name": "Kashmiri Korma",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1113,
+                "name": "Handi Paneer",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1114,
+                "name": "Paneer Tikka Tak",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1115,
+                "name": "Mahadev Special Sabzi",
+                "half_price": "100",
+                "full_price": "150"
+            },
+            {
+                "id": 1116,
+                "name": "Paneer Bhurji",
+                "half_price": "90",
+                "full_price": "130"
+            }
+        ],
+        "Mushroom Sabji": [
+            {
+                "id": 2101,
+                "name": "Matar Mushroom",
+                "half_price": "100",
+                "full_price": "170"
+            },
+            {
+                "id": 2102,
+                "name": "Mushroom Do Pyaza",
+                "half_price": "100",
+                "full_price": "170"
+            },
+            {
+                "id": 2103,
+                "name": "Mushroom Korma",
+                "half_price": "100",
+                "full_price": "170"
+            },
+            {
+                "id": 2104,
+                "name": "Mushroom Paneer",
+                "half_price": "100",
+                "full_price": "170"
+            },
+            {
+                "id": 2105,
+                "name": "Mushroom Masala",
+                "half_price": "100",
+                "full_price": "170"
+            }
+        ],
+        "Seasonal Veg": [
+            {
+                "id": 3101,
+                "name": "Baingan Bharta",
+                "half_price": "70",
+                "full_price": "120"
+            },
+            {
+                "id": 3102,
+                "name": "Aloo Gobi",
+                "half_price": "70",
+                "full_price": "120"
+            },
+            {
+                "id": 3103,
+                "name": "Bhindi",
+                "half_price": "70",
+                "full_price": "120"
+            },
+            {
+                "id": 3104,
+                "name": "Aloo Palak",
+                "half_price": "70",
+                "full_price": "120"
+            },
+            {
+                "id": 3105,
+                "name": "Gobi Masala",
+                "half_price": "90",
+                "full_price": "130"
+            },
+            {
+                "id": 3106,
+                "name": "Sarson Ka Saag",
+                "half_price": "90",
+                "full_price": "150"
+            },
+            {
+                "id": 3107,
+                "name": "Methi Masala",
+                "half_price": "70",
+                "full_price": "120"
+            },
+            {
+                "id": 3108,
+                "name": "Aloo Korma",
+                "half_price": "90",
+                "full_price": "150"
+            }
+        ],
+        "Dal": [
+            {
+                "id": 4101,
+                "name": "Dal Fry",
+                "half_price": "50",
+                "full_price": "80"
+            },
+            {
+                "id": 4102,
+                "name": "Dal Tadka",
+                "half_price": "80",
+                "full_price": "130"
+            },
+            {
+                "id": 4103,
+                "name": "Dal Palak",
+                "half_price": "80",
+                "full_price": "130"
+            },
+            {
+                "id": 4104,
+                "name": "Dal Makhani",
+                "half_price": "90",
+                "full_price": "150"
+            }
+        ],
+        "Kofta/Kaju Sabzi": [
+            {
+                "id": 5101,
+                "name": "Malai Kofta",
+                "half_price": "90",
+                "full_price": "150"
+            },
+            {
+                "id": 5102,
+                "name": "Paneer Kofta",
+                "half_price": "100",
+                "full_price": "170"
+            },
+            {
+                "id": 5103,
+                "name": "Kaju Paneer",
+                "half_price": "170",
+                "full_price": "250"
+            },
+            {
+                "id": 5104,
+                "name": "Kaju Curry",
+                "half_price": "170",
+                "full_price": "250"
+            }
+        ],
+        "Saada Sabzi": [
+            {
+                "id": 6101,
+                "name": "Aloo Chhole",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6102,
+                "name": "Aloo Matar",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6103,
+                "name": "Besan Ke Gatte",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6104,
+                "name": "Rajma Punjabi",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6105,
+                "name": "Kadhi Pakora",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6106,
+                "name": "Sev Tamatar",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6107,
+                "name": "Jeera Aloo",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6108,
+                "name": "Dahi Fry",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6109,
+                "name": "Lahsun Chutney",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6110,
+                "name": "Matar Masala",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6111,
+                "name": "Chana Masala",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6112,
+                "name": "Gatta Masala",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6113,
+                "name": "Dam Aloo",
+                "half_price": "70",
+                "full_price": "100"
+            },
+            {
+                "id": 6114,
+                "name": "Sev Bhaji (Mava Gravy)",
+                "half_price": "90",
+                "full_price": "130"
+            },
+            {
+                "id": 6115,
+                "name": "Malai Pyaz",
+                "half_price": "90",
+                "full_price": "130"
+            },
+            {
+                "id": 6116,
+                "name": "Mix Veg",
+                "half_price": "90",
+                "full_price": "130"
+            }
+        ],
+        "Beverages": [
+            {
+                "id": 7101,
+                "name": "Mineral Water",
+                "half_price": "40",
+                "full_price": "40"
+            },
+            {
+                "id": 7102,
+                "name": "Cold Drink (200 ml)",
+                "half_price": "40",
+                "full_price": "40"
+            }
+        ]
+    }
+}
