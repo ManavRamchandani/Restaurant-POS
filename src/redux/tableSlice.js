@@ -2,11 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  tables: [
-    { id: 1, name: '1', status: 'available', locked: false, position: { x: 0, y: 0 }, members: 0 },
-    { id: 2, name: '2', status: 'occupied', locked: false, position: { x: 100, y: 0 }, members: 6 },
-    { id: 3, name: '3', status: 'reserved', locked: false, position: { x: 200, y: 0 }, members: 0 },
-  ],
+  tables: [],
   isAdjustmentMode: false,
 };
 
@@ -14,51 +10,29 @@ const tablesSlice = createSlice({
   name: 'tables',
   initialState,
   reducers: {
-    updateTablePosition(state, action) {
-      const { id, position } = action.payload;
-      const table = state.tables.find((table) => table.id === id);
-      if (table) {
-        table.position = position;
-      }
+    setTables: (state, action) => {
+      state.tables = action.payload;
     },
-    addNewTable(state) {
-      const newTable = {
-        id: state.tables.length + 1,
-        name: (state.tables.length + 1).toString(),
-        status: 'available',
-        locked: false,
-        position: { x: 0, y: 0 },
-        members: 0,
-      };
-      state.tables.push(newTable);
-    },
-    toggleAdjustmentMode(state) {
-      state.isAdjustmentMode = !state.isAdjustmentMode;
-    },
-    toggleTableLock(state, action) {
+    occupyTable: (state, action) => {
       const table = state.tables.find((table) => table.id === action.payload);
       if (table) {
-        table.locked = !table.locked;
+        table.status = 'occupied';
       }
     },
-    updateTableMembers(state, action) { // Corrected export name
-      const { id, members } = action.payload;
-      const table = state.tables.find((table) => table.id === id);
+    releaseTable: (state, action) => {
+      const table = state.tables.find((table) => table.id === action.payload);
       if (table) {
-        table.members = members;
+        table.status = 'available';
       }
     },
-    updateTableStatus(state, action) {
-      const { id, status } = action.payload;
-      const table = state.tables.find((table) => table.id === id);
-      if (table) {
-        table.status = status;
-      }
+    toggleAdjustmentMode: (state) => {
+      state.isAdjustmentMode = !state.isAdjustmentMode;
     },
   },
 });
 
-export const { updateTablePosition, addNewTable, toggleAdjustmentMode, toggleTableLock, updateTableMembers, updateTableStatus } = tablesSlice.actions; // Include updateTableMembers in exports
+export const { setTables, occupyTable, releaseTable, toggleAdjustmentMode } =
+  tablesSlice.actions;
 
 export const selectTables = (state) => state.tables.tables;
 export const selectIsAdjustmentMode = (state) => state.tables.isAdjustmentMode;
