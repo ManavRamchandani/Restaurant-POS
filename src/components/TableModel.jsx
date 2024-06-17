@@ -16,8 +16,8 @@ const TableModal = ({ table, onClose, onSave }) => {
   }, [table]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded shadow-lg">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded shadow-lg z-50">
         <h2 className="text-xl font-bold mb-4">Table {table.name}</h2>
         <div className="mb-4">
           <label className="block mb-2">Number of Members</label>

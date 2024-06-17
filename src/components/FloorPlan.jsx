@@ -8,18 +8,28 @@ import tableChairImage from '../assets/table-chair.png';
 import TableModal from './TableModel';
 
 const FloorPlan = () => {
+    const [showAllTables, setShowAllTables] = useState(true); // Initially show all tables
   const navigate = useNavigate();
+  const [clickedTableId, setClickedTableId] = useState(null);
   const dispatch = useDispatch();
   const tables = useSelector(selectTables);
   const isAdjustmentMode = useSelector(selectIsAdjustmentMode);
   const [selectedTable, setSelectedTable] = useState(null);
   const [filter, setFilter] = useState('all');
+  
 
   const handleTableClick = (table) => {
     if (!isAdjustmentMode) {
       setSelectedTable(table);
+      setClickedTableId(table.id);
+      setShowAllTables(false); // Set to false to hide all tables when a table is clicked
+    } else {
+      setSelectedTable(null);
+      setClickedTableId(null);
+      setShowAllTables(true); // Set to true to display all tables when canceling
     }
   };
+  
 
   const updatePosition = (id, position) => {
     dispatch(updateTablePosition({ id, position }));
@@ -80,18 +90,22 @@ const FloorPlan = () => {
         </div>
       </div>
       <div className="relative">
-        {filteredTables.map((table) => (
-          <Draggable
-            key={table.id}
-            position={table.position}
-            onStop={(e, data) => updatePosition(table.id, { x: data.x, y: data.y })}
-            disabled={!isAdjustmentMode || table.locked}
-          >
-            <div
-              className="absolute cursor-move"
-              style={{ zIndex: table.locked ? 1 : 1000 }}
-              onMouseDown={(e) => e.preventDefault()}
-            >
+      {filteredTables.map((table) => (
+  <Draggable
+    key={table.id}
+    position={table.position}
+    onStop={(e, data) => updatePosition(table.id, { x: data.x, y: data.y })}
+    disabled={!isAdjustmentMode || table.locked}
+  >
+    <div
+      className="absolute cursor-move"
+      style={{
+        zIndex: table.locked ? 1 : 1,
+        // display: showAllTables || clickedTableId === table.id ? 'block' : 'none',
+      }}
+      onMouseDown={(e) => e.preventDefault()}
+    >
+
               <img
                 src={tableChairImage}
                 alt={`Table ${table.name}`}

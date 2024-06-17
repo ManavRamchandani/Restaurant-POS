@@ -1,18 +1,21 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import TablesPage from './pages/TablesPage';
-import CategoryPage from './pages/CategoryPage';
-import OrderHistory from './pages/OrderHistory';
+import { useState } from 'react'
+import './App.css'
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import HomePage from './pages/HomePage'
+import POSPage from './pages/POSPage'
+import CategoryPage from './pages/CategoryPage.jsx'
 
-const App = () => {
+function App() {
+
   return (
     <Router>
       <Routes>
-        <Route path="/category" element={<CategoryPage />} />
-        <Route path="/order-history" element={<OrderHistory />} />
-        <Route path="/" element={<TablesPage />} />
+        <Route path='/' element={<HomePage />} />
+        <Route path='/cat' element={<POSPage />} />
+        <Route path='/pos' element={<CategoryPage />} />
       </Routes>
     </Router>
-  );
-};
+  )
+}
 
-export default App;
+export default App

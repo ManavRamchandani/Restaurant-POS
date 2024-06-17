@@ -1,22 +1,14 @@
-import React, { useEffect, useState } from "react";
-import MainLayout from "../layouts/MainLayout";
-import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addProductToCart,
-  removeProduct,
-  increaseQuantity,
-  decreaseQuantity,
-  clearCart,
-  selectCart,
-  selectTotalAmount,
-} from "../redux/cartSlice";
-import { releaseTable } from "../redux/tableSlice";
+// src/pages/CategoryPage.js
+import React, { useEffect, useState } from 'react';
+import MainLayout from '../layouts/MainLayout';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { addProductToCart, removeProduct, increaseQuantity, decreaseQuantity, selectCart, selectTotalAmount } from '../redux/cartSlice';
 
 function CategoryPage() {
   const location = useLocation();
-  const navigate = useNavigate();
   const table = location.state?.table;
   const dispatch = useDispatch();
   const cart = useSelector(selectCart);
@@ -26,12 +18,6 @@ function CategoryPage() {
   const [openCategory, setOpenCategory] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [showClearTablePopup, setShowClearTablePopup] = useState(false);
-  const [orderDetails, setOrderDetails] = useState({
-    name: "",
-    phone: "",
-    time: "",
-  });
 
   const toastOptions = {
     autoClose: 400,
@@ -40,13 +26,13 @@ function CategoryPage() {
 
   const fetchProducts = async () => {
     setIsLoading(true);
-    const result = await axios.get("http://localhost:3000/category");
+    const result = await axios.get('http://localhost:3000/category');
     setCategories(await result.data);
     setIsLoading(false);
   };
 
   const handleAddProductToCart = (item, size) => {
-    const price = size === "half" ? item.half_price : item.full_price;
+    const price = size === 'half' ? item.half_price : item.full_price;
     dispatch(addProductToCart({ item, size, price }));
     setShowPopup(false);
   };
@@ -64,38 +50,10 @@ function CategoryPage() {
     setShowPopup(true);
   };
 
-  const handleClearTable = () => {
-    setShowClearTablePopup(true);
-  };
-
-  const handleOrderHistorySave = () => {
-    const orderHistory = JSON.parse(localStorage.getItem("orderHistory")) || [];
-    const newOrder = {
-      table: table.name,
-      items: cart,
-      totalAmount,
-      orderDetails,
-    };
-    orderHistory.push(newOrder);
-    localStorage.setItem("orderHistory", JSON.stringify(orderHistory));
-    dispatch(clearCart());
-    dispatch(releaseTable(table.id));
-    setShowClearTablePopup(false);
-    navigate("/");
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setOrderDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
-  };
-
   return (
     <MainLayout>
       {isLoading ? (
-        "loading"
+        'loading'
       ) : (
         <div className="grid grid-cols-3 gap-4">
           {/* Left column for Categories */}
@@ -160,9 +118,7 @@ function CategoryPage() {
             {/* Cart */}
             <div className="p-4 bg-gray-100 min-h-screen flex justify-center items-start">
               <div>
-                <h2 className="text-2xl font-bold mb-4">
-                  Table: {table?.name}
-                </h2>
+                <h2 className="text-2xl font-bold mb-4">Table: {table?.name}</h2>
                 {/* Cart Table */}
                 <table className="table-auto w-full text-left border-collapse">
                   {/* Table Headers */}
@@ -197,32 +153,26 @@ function CategoryPage() {
                           </td>
                           <td className="p-2 border border-gray-700 flex items-center gap-2">
                             <button
-                              className="px-2 py-1 bg-gray-700 rounded-md"
-                              onClick={() =>
-                                dispatch(decreaseQuantity(cartProduct.id))
-                              }
+                              className="px-2 py-1 bg-gray-700 text-white rounded-md"
+                              onClick={() => dispatch(decreaseQuantity({ id: cartProduct.id, size: cartProduct.size }))}
                             >
                               -
                             </button>
                             {cartProduct.quantity}
                             <button
-                              className="px-2 py-1 bg-gray-700 rounded-md"
-                              onClick={() =>
-                                dispatch(increaseQuantity(cartProduct.id))
-                              }
+                              className="px-2 py-1 bg-gray-700 text-white rounded-md"
+                              onClick={() => dispatch(increaseQuantity({ id: cartProduct.id, size: cartProduct.size }))}
                             >
                               +
                             </button>
                           </td>
                           <td className="p-2 border border-gray-700">
-                            {cartProduct.price * cartProduct.quantity}
+                            {cartProduct.totalAmount}
                           </td>
                           <td className="p-2 border border-gray-700">
                             <button
-                              className="px-2 py-1 bg-red-600 text-white rounded-md"
-                              onClick={() =>
-                                dispatch(removeProduct(cartProduct.id))
-                              }
+                              className="px-2 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                              onClick={() => dispatch(removeProduct({ id: cartProduct.id, size: cartProduct.size }))}
                             >
                               Remove
                             </button>
@@ -231,60 +181,65 @@ function CategoryPage() {
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="7"
-                          className="p-2 border border-gray-700 text-center"
-                        >
-                          No items in the cart.
+                        <td colSpan="7" className="p-4 text-center text-gray-500">
+                          No Item in Cart
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
-                {/* Order Details */}
-                <div className="mt-4">
-                  <h3 className="text-xl font-semibold mb-2">Order Details</h3>
-                  <div className="flex flex-col gap-4">
-                    <input
-                      type="text"
-                      name="name"
-                      value={orderDetails.name}
-                      onChange={handleInputChange}
-                      placeholder="Name"
-                      className="p-2 border border-gray-300 rounded-md"
-                    />
-                    <input
-                      type="text"
-                      name="phone"
-                      value={orderDetails.phone}
-                      onChange={handleInputChange}
-                      placeholder="Phone"
-                      className="p-2 border border-gray-300 rounded-md"
-                    />
-                    <input
-                      type="text"
-                      name="time"
-                      value={orderDetails.time}
-                      onChange={handleInputChange}
-                      placeholder="Time"
-                      className="p-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
+                {/* Total Amount */}
+                <h1 className="mt-4 text-2xl font-bold text-gray-800">
+                  Total Amount: Rs. {totalAmount}
+                </h1>
+                <div className="mt-3">
+                  {/* Render payment button */}
+                  {totalAmount !== 0 ? (
+                    <div>
+                      <button className="py-2 px-5 rounded-md border border-gray-700 bg-blue-600 text-white font-semibold">
+                        Pay Now
+                      </button>
+                    </div>
+                  ) : (
+                    'Please add Item to Cart'
+                  )}
                 </div>
-
-                {/* Save Order Button */}
-                <button
-                  onClick={handleOrderHistorySave}
-                  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md"
-                >
-                  Save Order
-                </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pop-up for choosing half or full */}
+      {showPopup && selectedItem && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4">Choose Size</h2>
+            <div className="flex gap-4">
+              <button
+                className="py-2 px-4 bg-blue-600 text-white rounded-md"
+                onClick={() => handleAddProductToCart(selectedItem, 'half')}
+              >
+                Half - Rs. {selectedItem.half_price || 'N/A'}
+              </button>
+              <button
+                className="py-2 px-4 bg-green-600 text-white rounded-md"
+                onClick={() => handleAddProductToCart(selectedItem, 'full')}
+              >
+                Full - Rs. {selectedItem.full_price || 'N/A'}
+              </button>
+            </div>
+            <button
+              className="mt-4 py-2 px-4 bg-red-600 text-white rounded-md"
+              onClick={() => setShowPopup(false)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
     </MainLayout>
   );
 }
+
 export default CategoryPage;
