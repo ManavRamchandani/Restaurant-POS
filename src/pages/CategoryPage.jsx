@@ -1,23 +1,37 @@
-// src/pages/CategoryPage.js
-import React, { useEffect, useState } from 'react';
-import MainLayout from '../layouts/MainLayout';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
-import { addProductToCart, removeProduct, increaseQuantity, decreaseQuantity, selectCart, selectTotalAmount } from '../redux/cartSlice';
+import React, { useEffect, useState } from "react";
+import MainLayout from "../layouts/MainLayout";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import {
+  addProductToCart,
+  removeProduct,
+  increaseQuantity,
+  decreaseQuantity,
+  clearTableCart,
+  selectCart,
+  selectTotalAmount,
+} from "../redux/cartSlice";
+import { clearTable } from "../redux/tableSlice";
 
 function CategoryPage() {
+  const navigate = useNavigate();
   const location = useLocation();
   const table = location.state?.table;
   const dispatch = useDispatch();
-  const cart = useSelector(selectCart);
-  const totalAmount = useSelector(selectTotalAmount);
+  const cart = useSelector((state) => selectCart(state, table?.id));
+  const totalAmount = useSelector((state) =>
+    selectTotalAmount(state, table?.id)
+  );
   const [categories, setCategories] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [openCategory, setOpenCategory] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false); // State for confirmation popup
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
 
   const toastOptions = {
     autoClose: 400,
@@ -26,15 +40,46 @@ function CategoryPage() {
 
   const fetchProducts = async () => {
     setIsLoading(true);
-    const result = await axios.get('http://localhost:3000/category');
+    const result = await axios.get("http://localhost:3000/category");
     setCategories(await result.data);
     setIsLoading(false);
   };
 
   const handleAddProductToCart = (item, size) => {
-    const price = size === 'half' ? item.half_price : item.full_price;
-    dispatch(addProductToCart({ item, size, price }));
+    const price = size === "half" ? item.half_price : item.full_price;
+    dispatch(addProductToCart({ tableId: table.id, item, size, price }));
     setShowPopup(false);
+  };
+
+  const handleClearTable = () => {
+    setConfirmClear(true);
+  };
+
+  const confirmClearTable = () => {
+    if (!customerName.trim()) {
+      toast.error('Name is required', toastOptions);
+      return;
+    }
+
+    // Save order to order history
+    const order = {
+      tableId: table.id,
+      tableName: table.name,
+      customerName,
+      customerPhone,
+      cart,
+      totalAmount,
+      date: new Date().toISOString(),
+    };
+    // For simplicity, we're using localStorage to store order history
+    const orderHistory = JSON.parse(localStorage.getItem('orderHistory')) || [];
+    orderHistory.push(order);
+    localStorage.setItem('orderHistory', JSON.stringify(orderHistory));
+
+    dispatch(clearTableCart({ tableId: table.id }));
+    dispatch(clearTable({ tableId: table.id }));
+    setConfirmClear(false);
+    navigate("/");
   };
 
   useEffect(() => {
@@ -53,7 +98,7 @@ function CategoryPage() {
   return (
     <MainLayout>
       {isLoading ? (
-        'loading'
+        "loading"
       ) : (
         <div className="grid grid-cols-3 gap-4">
           {/* Left column for Categories */}
@@ -118,7 +163,9 @@ function CategoryPage() {
             {/* Cart */}
             <div className="p-4 bg-gray-100 min-h-screen flex justify-center items-start">
               <div>
-                <h2 className="text-2xl font-bold mb-4">Table: {table?.name}</h2>
+                <h2 className="text-2xl font-bold mb-4">
+                  Table: {table?.name}
+                </h2>
                 {/* Cart Table */}
                 <table className="table-auto w-full text-left border-collapse">
                   {/* Table Headers */}
@@ -135,12 +182,11 @@ function CategoryPage() {
                   </thead>
                   {/* Table Body */}
                   <tbody>
-                    {/* Render cart items */}
                     {cart && cart.length > 0 ? (
                       cart.map((cartProduct, key) => (
                         <tr key={key} className="bg-gray-900 text-gray-300">
                           <td className="p-2 border border-gray-700">
-                            {cartProduct.id}
+                            {key + 1}
                           </td>
                           <td className="p-2 border border-gray-700">
                             {cartProduct.name}
@@ -151,28 +197,54 @@ function CategoryPage() {
                           <td className="p-2 border border-gray-700">
                             {cartProduct.price}
                           </td>
-                          <td className="p-2 border border-gray-700 flex items-center gap-2">
-                            <button
-                              className="px-2 py-1 bg-gray-700 text-white rounded-md"
-                              onClick={() => dispatch(decreaseQuantity({ id: cartProduct.id, size: cartProduct.size }))}
-                            >
-                              -
-                            </button>
-                            {cartProduct.quantity}
-                            <button
-                              className="px-2 py-1 bg-gray-700 text-white rounded-md"
-                              onClick={() => dispatch(increaseQuantity({ id: cartProduct.id, size: cartProduct.size }))}
-                            >
-                              +
-                            </button>
+                          <td className="p-2 border border-gray-700">
+                            <div className="flex items-center gap-2">
+                              <button
+                                className="px-2 py-1 bg-gray-700 text-white rounded-md"
+                                onClick={() =>
+                                  dispatch(
+                                    decreaseQuantity({
+                                      tableId: table.id,
+                                      id: cartProduct.id,
+                                      size: cartProduct.size,
+                                    })
+                                  )
+                                }
+                              >
+                                -
+                              </button>
+                              <span>{cartProduct.quantity}</span>
+                              <button
+                                className="px-2 py-1 bg-gray-700 text-white rounded-md"
+                                onClick={() =>
+                                  dispatch(
+                                    increaseQuantity({
+                                      tableId: table.id,
+                                      id: cartProduct.id,
+                                      size: cartProduct.size,
+                                    })
+                                  )
+                                }
+                              >
+                                +
+                              </button>
+                            </div>
                           </td>
                           <td className="p-2 border border-gray-700">
                             {cartProduct.totalAmount}
                           </td>
                           <td className="p-2 border border-gray-700">
                             <button
-                              className="px-2 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                              onClick={() => dispatch(removeProduct({ id: cartProduct.id, size: cartProduct.size }))}
+                              className="px-3 py-1 bg-red-500 text-white rounded-md"
+                              onClick={() =>
+                                dispatch(
+                                  removeProduct({
+                                    tableId: table.id,
+                                    id: cartProduct.id,
+                                    size: cartProduct.size,
+                                  })
+                                )
+                              }
                             >
                               Remove
                             </button>
@@ -181,30 +253,85 @@ function CategoryPage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="p-4 text-center text-gray-500">
+                        <td
+                          colSpan="7"
+                          className="p-4 text-center text-gray-500"
+                        >
                           No Item in Cart
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
+
                 {/* Total Amount */}
-                <h1 className="mt-4 text-2xl font-bold text-gray-800">
-                  Total Amount: Rs. {totalAmount}
-                </h1>
-                <div className="mt-3">
-                  {/* Render payment button */}
-                  {totalAmount !== 0 ? (
-                    <div>
-                      <button className="py-2 px-5 rounded-md border border-gray-700 bg-blue-600 text-white font-semibold">
-                        Pay Now
-                      </button>
-                    </div>
-                  ) : (
-                    'Please add Item to Cart'
-                  )}
+                <div className="mt-4 text-right">
+                  <h3 className="text-xl font-bold text-gray-700">
+                    Total: {totalAmount}
+                  </h3>
+                </div>
+
+                {/* Pay Now and Clear Table Buttons */}
+                <div className="mt-4 text-right">
+                  <button className="px-4 py-2 bg-green-500 text-white rounded-md">
+                    Pay Now
+                  </button>
+                  <button
+                    onClick={() => setConfirmClear(true)}
+                    className="py-2 px-4 bg-red-600 text-white rounded-md"
+                  >
+                    Clear Table
+                  </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Pop-up for Clear Table */}
+      {confirmClear && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-bold mb-4">Confirm Clear Table</h2>
+            <p className="mb-4">Please enter the customer's name and mobile number:</p>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="customerName">
+                Name (required)
+              </label>
+              <input
+                type="text"
+                id="customerName"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="customerPhone">
+                Mobile Number (optional)
+              </label>
+              <input
+                type="text"
+                id="customerPhone"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded-md mr-2"
+                onClick={confirmClearTable}
+              >
+                Yes, Clear Table
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded-md"
+                onClick={() => setConfirmClear(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -218,15 +345,15 @@ function CategoryPage() {
             <div className="flex gap-4">
               <button
                 className="py-2 px-4 bg-blue-600 text-white rounded-md"
-                onClick={() => handleAddProductToCart(selectedItem, 'half')}
+                onClick={() => handleAddProductToCart(selectedItem, "half")}
               >
-                Half - Rs. {selectedItem.half_price || 'N/A'}
+                Half - Rs. {selectedItem.half_price || "N/A"}
               </button>
               <button
                 className="py-2 px-4 bg-green-600 text-white rounded-md"
-                onClick={() => handleAddProductToCart(selectedItem, 'full')}
+                onClick={() => handleAddProductToCart(selectedItem, "full")}
               >
-                Full - Rs. {selectedItem.full_price || 'N/A'}
+                Full - Rs. {selectedItem.full_price || "N/A"}
               </button>
             </div>
             <button
