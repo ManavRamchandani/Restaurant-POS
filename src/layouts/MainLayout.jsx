@@ -10,7 +10,7 @@ function MainLayout({ children }) {
         <nav className='p-3 w-full bg-blue-500 flex justify-between'>
           <Link to='/' className='text-white'>MahadevPos</Link>
           <div>
-          <Link to='/packing-orders' className='text-white mr-4'>Packing</Link>
+          <Link to='/packing-order' className='text-white mr-4'>Packing</Link>
             <Link to='/order-history' className='text-white underline mr-4'>Order History</Link>
             <Link to='/day-summary' className='text-white underline'>Day Summary</Link>
           </div>

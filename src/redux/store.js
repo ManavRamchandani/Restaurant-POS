@@ -4,6 +4,8 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import tablesReducer from './tableSlice';
 import cartReducer from './cartSlice';
+import packingCartReducer from './PackingCartSlice'
+import ordersReducer from './ordersSlice';
 
 
 const persistConfig = {
@@ -17,6 +19,8 @@ export const store = configureStore({
   reducer: {
     tables: persistedReducer,
     cart: cartReducer,
+    packingCart: packingCartReducer,
+    orders: ordersReducer,
   },
 });
 

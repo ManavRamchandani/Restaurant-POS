@@ -8,11 +8,13 @@ import {
   updateTableMembers,
   updateTableStatus,
   removeTable,
+  mergeTables,
+  unmergeTable,
   selectTables,
   selectIsAdjustmentMode,
   switchFloor,
   selectCurrentFloor,
-  resetTables, // Import the resetTables action
+  resetTables,
 } from '../redux/tableSlice';
 import Draggable from 'react-draggable';
 import tableChairImage from '../assets/table-chair.png';
@@ -26,7 +28,8 @@ const FloorPlan = () => {
   const currentFloor = useSelector(selectCurrentFloor);
   const [selectedTable, setSelectedTable] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State to manage dropdown visibility
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedTables, setSelectedTables] = useState([]);
 
   const handleTableClick = (table) => {
     if (!isAdjustmentMode) {
@@ -40,7 +43,7 @@ const FloorPlan = () => {
   };
 
   const updatePosition = (id, position) => {
-    dispatch(updateTablePosition({ id, position, floor: currentFloor })); // Include floor parameter
+    dispatch(updateTablePosition({ id, position, floor: currentFloor }));
   };
 
   const closeModal = () => {
@@ -48,8 +51,8 @@ const FloorPlan = () => {
   };
 
   const saveTableDetails = (table) => {
-    dispatch(updateTableMembers({ id: table.id, members: table.members, floor: currentFloor })); // Include floor parameter
-    dispatch(updateTableStatus({ id: table.id, status: table.status, floor: currentFloor })); // Include floor parameter
+    dispatch(updateTableMembers({ id: table.id, members: table.members, floor: currentFloor }));
+    dispatch(updateTableStatus({ id: table.id, status: table.status, floor: currentFloor }));
     closeModal();
     if (table.status === 'occupied') {
       navigate('/pos', { state: { table } });
@@ -57,7 +60,7 @@ const FloorPlan = () => {
   };
 
   const removeTableHandler = (id) => {
-    dispatch(removeTable({ id, floor: currentFloor })); // Include floor parameter
+    dispatch(removeTable({ id, floor: currentFloor }));
   };
 
   const getStatusColor = (status) => {
@@ -81,12 +84,45 @@ const FloorPlan = () => {
 
   const handleFloorSelect = (floor) => {
     dispatch(switchFloor(floor));
-    setIsDropdownOpen(false); // Close dropdown after selecting a floor
+    setIsDropdownOpen(false);
   };
 
   const handleResetTables = () => {
-    dispatch(resetTables()); // Dispatch the resetTables action to reset table data
-    setSelectedTable(null); // Clear selected table
+    dispatch(resetTables());
+  };
+
+  const handleMergeTables = () => {
+    if (selectedTables.length < 2) {
+      alert('Please select at least two tables to merge.');
+      return;
+    }
+
+    const mergedTableIds = selectedTables.map(table => table.id);
+    const mergedTableName = selectedTables.map(table => table.name).join('+');
+
+    dispatch(mergeTables({ ids: mergedTableIds, name: mergedTableName, floor: currentFloor }));
+    setSelectedTables([]); // Clear selected tables after merge
+  };
+
+  const handleUnmergeTable = (table) => {
+    if (!table.mergedTables) return;
+
+    dispatch(unmergeTable({ table, floor: currentFloor }));
+  };
+
+  const handleAddNewTable = () => {
+    const highestId = tables.reduce((maxId, table) => (table.id > maxId ? table.id : maxId), 0);
+    const newTableId = highestId + 1;
+
+    dispatch(addNewTable({ floor: currentFloor, id: newTableId }));
+  };
+
+  const handleTableSelect = (table) => {
+    if (selectedTables.some(t => t.id === table.id)) {
+      setSelectedTables(selectedTables.filter(t => t.id !== table.id));
+    } else {
+      setSelectedTables([...selectedTables, table]);
+    }
   };
 
   return (
@@ -104,22 +140,22 @@ const FloorPlan = () => {
         <div className="flex space-x-2">
           <button
             className="bg-blue-600 text-white p-3 rounded-full shadow-lg"
-            onClick={() => dispatch(addNewTable({ floor: currentFloor }))} // Include floor parameter
+            onClick={handleAddNewTable}
           >
             + New Table
           </button>
           <button
             className={`p-3 rounded-full shadow-lg ${isAdjustmentMode ? 'bg-red-600' : 'bg-green-600'} text-white`}
-            onClick={() => dispatch(toggleAdjustmentMode({ floor: currentFloor }))} // Include floor parameter
+            onClick={() => dispatch(toggleAdjustmentMode({ floor: currentFloor }))}
           >
             {isAdjustmentMode ? 'Exit Adjustment Mode' : 'Enter Adjustment Mode'}
           </button>
           <div className="relative">
             <button
               className="bg-gray-600 text-white p-3 rounded-full shadow-lg"
-              onClick={toggleDropdown} // Toggle dropdown visibility
+              onClick={toggleDropdown}
             >
-              {currentFloor === 'floor1' ? 'Floor 1' : 'Floor 2'} {/* Display current floor name */}
+              {currentFloor === 'floor1' ? 'Floor 1' : 'Floor 2'}
             </button>
             {isDropdownOpen && (
               <div className="absolute mt-2 w-36 rounded-lg shadow-lg bg-white border border-gray-300">
@@ -140,7 +176,7 @@ const FloorPlan = () => {
           </div>
           <button
             className="bg-gray-600 text-white p-3 rounded-full shadow-lg"
-            onClick={handleResetTables} // Reset tables button
+            onClick={handleResetTables}
           >
             Reset
           </button>
@@ -171,7 +207,7 @@ const FloorPlan = () => {
               <div className="text-center font-bold">
                 {table.name}
               </div>
-              {isAdjustmentMode && (
+              {isAdjustmentMode && !table.mergedTables && (
                 <button
                   className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 text-white px-2 py-1 rounded"
                   onClick={() => removeTableHandler(table.id)}
@@ -179,10 +215,34 @@ const FloorPlan = () => {
                   Remove
                 </button>
               )}
+              {isAdjustmentMode && table.mergedTables && (
+                <button
+                  className="absolute bottom-0 left-0 mb-2 ml-2 bg-yellow-500 text-white px-2 py-1 rounded"
+                  onClick={() => handleUnmergeTable(table)}
+                >
+                  Unmerge
+                </button>
+              )}
+              {isAdjustmentMode && (
+                <input
+                  type="checkbox"
+                  className="absolute top-0 left-0 mt-2 ml-2"
+                  checked={selectedTables.some(t => t.id === table.id)}
+                  onChange={() => handleTableSelect(table)}
+                />
+              )}
             </div>
           </Draggable>
         ))}
       </div>
+      {isAdjustmentMode && selectedTables.length >= 2 && (
+        <button
+          className="bg-blue-600 text-white p-3 rounded-full shadow-lg absolute top-4 right-4"
+          onClick={handleMergeTables}
+        >
+          Merge Tables
+        </button>
+      )}
       {selectedTable && !isAdjustmentMode && (
         <TableModal
           table={selectedTable}

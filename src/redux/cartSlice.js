@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
 
 const initialState = {
   tables: {},
@@ -20,7 +21,7 @@ const cartSlice = createSlice({
       );
       if (cartItem) {
         cartItem.quantity += 1;
-        cartItem.totalAmount + cartItem.totalAmount + parseInt(price);
+        cartItem.totalAmount += parseInt(price);
       } else {
         state.tables[tableId].push({
           ...item,
@@ -30,7 +31,7 @@ const cartSlice = createSlice({
           totalAmount: price,
         });
       }
-      state.totalAmount[tableId] = state.totalAmount[tableId] + parseInt(price);
+      state.totalAmount[tableId] += parseInt(price);
     },
     removeProduct: (state, action) => {
       const { tableId, id, size } = action.payload;
@@ -82,7 +83,17 @@ export const {
   clearTableCart,
 } = cartSlice.actions;
 
-export const selectCart = (state, tableId) => state.cart.tables[tableId] || [];
-export const selectTotalAmount = (state, tableId) => state.cart.totalAmount[tableId] || 0;
+// Memoized selectors
+export const selectCartState = (state) => state.cart;
+
+export const selectCart = createSelector(
+  [selectCartState, (_, tableId) => tableId],
+  (cart, tableId) => cart.tables[tableId] || []
+);
+
+export const selectTotalAmount = createSelector(
+  [selectCartState, (_, tableId) => tableId],
+  (cart, tableId) => cart.totalAmount[tableId] || 0
+);
 
 export default cartSlice.reducer;
